@@ -83,7 +83,19 @@ def generateTrialVectors(dbConnection, tokenizer, model):
 def pushVectorsToTrialTable(dbConnection, allTrialVectors):
     """Push the trial vectors back to DB"""
 
-    
+    # First we need to serialize allTrialVectors
+
+    # Then we need to potentially add a column for serailizedVectors
+
+    # Then we can push SQL UPDATEs
+    sql = """
+        UPDATE clinical_trials
+        SET vectors = {0}
+        WHERE ID = {1}
+    """
+
+    # Format the SQL command with the id & vector and then execute it on a cursor, and finally commit the transaction
+    dbConnection.cursor().execute(sql.format(serializedVectors, id)).commit()
 
 
 def dotProduct(text, trialVectors):
