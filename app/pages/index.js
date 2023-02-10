@@ -43,8 +43,18 @@ export default function Home() {
         <h1 className="text-3xl font-bold">
           Search a database of 15k clinical trials using medBERT
         </h1>
+
         <input type="text" id="searchFor" className="" />
         <input type="submit" value="Search" onClick={search} id="submit" />
+        <p className="mb-3">
+          Take a look at the code on github at{" "}
+          <a
+            href="https://github.com/zachblume/tmn-demo"
+            className="font-medium text-blue-600 dark:text-blue-500 underline"
+          >
+            https://github.com/zachblume/tmn-demo
+          </a>
+        </p>
         <ul
           role="list"
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
