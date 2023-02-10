@@ -8,7 +8,7 @@ import Image from "next/image";
 export default function Home() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([
-    "Start by searching for matching trials... try 'cancer' or 'asthma'",
+    "Start by searching for matching trials... try 'cancer' or 'asthma' ... and click the search button.",
   ]);
   const [isLoading, setLoading] = useState(false);
 
