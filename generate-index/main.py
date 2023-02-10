@@ -155,10 +155,12 @@ def findClosestDotProduct(text, tokenizer, model, dbConnection):
     IDscorePairs = sorted(IDscorePairs, key=lambda x: x[1], reverse=True)
 
     # Output passages & scores
+    results = []
     for ID, score in IDscorePairs:
         # return ID
         # return scores[]
-        return str(ID)+str(score)+str(trialAbstracts[ID])
+        results.append(trialAbstracts[ID])
+    return results
 
 
 def meanPooling(output, attentionMask):
