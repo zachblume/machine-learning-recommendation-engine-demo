@@ -121,22 +121,22 @@ def pushVectorsToTrialTable(dbConnection, allTrialVectors):
     dbConnection.commit()
 
 
-def findClosestDotProduct(text):
+def findClosestDotProduct(text, tokenizer, model, dbConnection):
     # Transform text to vector embedding
-    vectorOutputToCompare = transform(text)
+    vectorOutputToCompare = transform(text, tokenizer, model)
 
     # Load trialVectors from database
     trialTable = pd.read_sql_query(
         "SELECT * from clinical_trials WHERE abstract_text!='' LIMIT 1000", dbConnection)
 
-    # Deserialize (unpickle and base 64 decode) the vector embeddings in place
-    for i in range(len(trialTable)):
-        trialTable[i].serialized_vectors = pickle.loads(codecs.decode(
-            trialTable[i].serialized_vectors.encode(), "base64"))
-
     # Panda=>list for trialIDs and serialized_vectors
-    trialIDs = trialVectors.id.values.tolist()
+    trialIDs = trialTable.id.values.tolist()
     trialVectors = trialTable.serialized_vectors.values.tolist()
+
+    # Deserialize (unpickle and base 64 decode) the vector embeddings in place
+    for i in range(len(trialVectors)):
+        trialVectors[i] = pickle.loads(codecs.decode(
+            trialVectors[i].encode(), "base64"))
 
     # Compute dot score between query and all trial vectors
     scores = torch.mm(vectorOutputToCompare, trialVectors.transpose(0, 1))[
@@ -224,7 +224,7 @@ def main():
         print("Table already precomputed")
 
         query = "alzheimers"
-        result = findClosestDotProduct(query)
+        result = findClosestDotProduct(query, tokenizer, model, dbConnection)
         print(result)
 
     print("END")
