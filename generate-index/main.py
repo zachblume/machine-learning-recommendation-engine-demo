@@ -121,23 +121,36 @@ def pushVectorsToTrialTable(dbConnection, allTrialVectors):
     dbConnection.commit()
 
 
-def dotProduct(text):
-    # Transform text to vectors
-    vectorOutput = transform(text)
+def findClosestDotProduct(text):
+    # Transform text to vector embedding
+    vectorOutputToCompare = transform(text)
+
+    # Load trialVectors from database
+    trialTable = pd.read_sql_query(
+        "SELECT * from clinical_trials WHERE abstract_text!='' LIMIT 1000", dbConnection)
+
+    # Deserialize (unpickle and base 64 decode) the vector embeddings in place
+    for i in range(len(trialTable)):
+        trialTable[i].serialized_vectors = pickle.loads(codecs.decode(
+            trialTable[i].serialized_vectors.encode(), "base64"))
+
+    # Panda=>list for trialIDs and serialized_vectors
+    trialIDs = trialVectors.id.values.tolist()
+    trialVectors = trialTable.serialized_vectors.values.tolist()
 
     # Compute dot score between query and all trial vectors
-    scores = torch.mm(vectorOutput, trialVectors.transpose(0, 1))[
+    scores = torch.mm(vectorOutputToCompare, trialVectors.transpose(0, 1))[
         0].cpu().tolist()
 
-    # Combine docs & scores
-    doc_score_pairs = list(zip(docs, scores))
+    # Combine trialIDs & scores
+    IDscorePairs = list(zip(trialIDs, scores))
 
     # Sort by decreasing score
-    doc_score_pairs = sorted(doc_score_pairs, key=lambda x: x[1], reverse=True)
+    IDscorePairs = sorted(IDscorePairs, key=lambda x: x[1], reverse=True)
 
     # Output passages & scores
-    for doc, score in doc_score_pairs:
-        print(score, doc)
+    for ID, score in IDscorePairs:
+        return ID
 
 
 def meanPooling(output, attentionMask):
@@ -209,6 +222,10 @@ def main():
 
     else:
         print("Table already precomputed")
+
+        query = "alzheimers"
+        result = findClosestDotProduct(query)
+        print(result)
 
     print("END")
 
