@@ -70,25 +70,45 @@ export default function Home() {
         >
           {isLoading
             ? "Loading..."
-            : results.map((result, index) => (
-                <li
-                  className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow"
-                  key={index}
-                >
-                  <div className="flex w-full items-center justify-between space-x-6 p-6">
-                    <div className="flex-1">
-                      <p className="mt-1  text-sm text-gray-500">
-                        <Highlighter
-                          highlightClassName="YourHighlightClass"
-                          searchWords={query.split(" ")}
-                          autoEscape={true}
-                          textToHighlight={result.substring(0, 250)}
-                        />
-                      </p>
+            : results.map((result, index) => {
+                let resultSplit = result.split("||||");
+                let truncatedText =
+                  (resultSplit[1] || "").substring(9, 250) || "";
+                let score;
+                if (resultSplit.length > 1) {
+                  score = resultSplit[0] || 0;
+                  score = parseFloat(score).toFixed(4) || 0;
+                } else score = resultSplit[0];
+
+                return (
+                  <li
+                    className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow"
+                    key={index}
+                  >
+                    <div className="flex w-full items-center justify-between space-x-6 p-6">
+                      <div className="flex-1">
+                        <p className="mt-1  text-sm text-gray-500">
+                          {resultSplit.length > 1 ? (
+                            <>
+                              <span class="inline-flex items-center rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                                (Match Score: {score}){" "}
+                              </span>
+                            </>
+                          ) : (
+                            score
+                          )}
+                          <Highlighter
+                            highlightClassName="YourHighlightClass"
+                            searchWords={query.split(" ")}
+                            autoEscape={true}
+                            textToHighlight={truncatedText}
+                          />
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
         </ul>
       </main>
     </div>
