@@ -194,15 +194,19 @@ def main():
 
     # If the trials table doesn't exist...
     cursor = dbConnection.cursor()
-    tableExists = cursor.execute(
+    trialTableExists = cursor.execute(
         """
-        SELECT name FROM sqlite_master WHERE type='table' AND name='clinical_trials'
+        SELECT name FROM sqlite_master
+        WHERE type='table'
+        AND name='clinical_trials'
         """).fetchall()
-    if not tableExists:
+
+    if not trialTableExists:
         # Precompute the trial vector embeddings and store in the database (this only needs to be executed once...)
         loadTrialsTableFromTestData(dbConnection)
         allTrialVectors = generateTrialVectors(dbConnection, tokenizer, model)
         pushVectorsToTrialTable(dbConnection, allTrialVectors)
+
     else:
         print("Table already precomputed")
 
