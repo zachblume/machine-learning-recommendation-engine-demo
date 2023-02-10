@@ -1,9 +1,11 @@
-# A simple Python script to:
-# * Load the medBERT model
-# * Produce and store vectors for 15k public clinical trial article abstracts
-# * Produce and store vectors for a series of example clinical questions
-# * Precalculate the best matching trial for each question
-# * Allow for realtime search by the consumer appliaction by generalizing these methods
+"""
+ A simple Python script to:
+ * Load the medBERT model
+ * Produce and store vectors for 15k public clinical trial article abstracts
+ * Produce and store vectors for a series of example clinical questions
+ * Precalculate the best matching trial for each question
+ * Allow for realtime search by the consumer appliaction by generalizing these methods
+"""
 
 import numpy as np
 import pandas as pd
@@ -17,10 +19,12 @@ from transformers import AutoTokenizer, AutoModel
 
 
 def loadTrialsTableFromTestData(dbConnection):
-    """ Load the training database file into a proper database format
-        PubMed 200k RCT dataset
-        https://github.com/Franck-Dernoncourt/pubmed-rct
-        15ktrain.txt (from the 20k folder)"""
+    """
+    Load the training database file into a proper database format
+    PubMed 200k RCT dataset
+    https://github.com/Franck-Dernoncourt/pubmed-rct
+    15ktrain.txt (from the 20k folder)
+    """
 
     # Open the file
     filename = '15ktrain.txt'
@@ -55,7 +59,6 @@ def generateTrialVectors(dbConnection, tokenizer, model):
     # Let's make this maneagable lists of 100 at a time
     for i in range(math.floor(len(trialsList) / 100)):
         print("FOR loop")
-        print(i)
         start = i*100
         end = start + 100
         chunk = trialsList[start:end]
@@ -87,12 +90,17 @@ def dotProduct():
 
 
 def meanPooling(output, attentionMask):
-    """Mean Pooling - Take average of all tokens
-        This math was taken from a framework."""
+    """
+    Mean Pooling - Take average of all tokens
+    This math was taken from a framework.
+    """
     tokenVectors = output.last_hidden_state
     expandedMask = attentionMask.unsqueeze(
         -1).expand(tokenVectors.size()).float()
-    return (torch.sum(tokenVectors * expandedMask, 1) / torch.clamp(expandedMask.sum(1), min=1e-9))
+    return (
+        torch.sum(tokenVectors * expandedMask, 1) /
+        torch.clamp(expandedMask.sum(1), min=1e-9)
+    )
 
 
 def transform(text, tokenizer, model):
