@@ -31,6 +31,13 @@ export default function Home() {
     setQuery(document.getElementById("searchFor").value);
   }
 
+  function keypress(event) {
+    // If the user presses the "Enter" key on the keyboard
+    if (event.key === "Enter") {
+      search();
+    }
+  }
+
   return (
     <div>
       <Head>
@@ -44,8 +51,14 @@ export default function Home() {
           Search a database of 15k clinical trials using medBERT
         </h1>
 
-        <input type="text" id="searchFor" className="" />
-        <input type="submit" value="Search" onClick={search} id="submit" />
+        <input type="text" id="searchFor" className="" onKeyDown={keypress} />
+        <input
+          type="submit"
+          value="Search"
+          onClick={search}
+          id="submit"
+          onKeyDown={keypress}
+        />
         <p className="mb-1">
           Take a look at the code on github at{" "}
           <a
@@ -62,7 +75,8 @@ export default function Home() {
         </p>
         <p className="mb-3">
           Try it out by searching for matching trials... try &apos;cancer&apos;
-          or &apos;asthma&apos; ... and click the search button.
+          or &apos;asthma&apos; or &apos;oxygen saturation&apos; ... and click
+          the search button.
         </p>
         <ul
           role="list"
@@ -90,7 +104,7 @@ export default function Home() {
                         <p className="mt-1  text-sm text-gray-500">
                           {resultSplit.length > 1 ? (
                             <>
-                              <span class="inline-flex items-center rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 mb-3">
+                              <span className="inline-flex items-center rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 mb-3">
                                 (Match Score: {score}){" "}
                               </span>
                             </>
