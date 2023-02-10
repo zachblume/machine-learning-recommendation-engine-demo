@@ -95,7 +95,7 @@ def pushVectorsToTrialTable(dbConnection, allTrialVectors):
     """Push the trial vectors back to DB"""
 
     # Prep db cursor
-    # cursor = dbConnection.cursor()
+    cursor = dbConnection.cursor()
 
     # Prep SQL statement to push SQL UPDATEs
     sql = """
@@ -104,11 +104,8 @@ def pushVectorsToTrialTable(dbConnection, allTrialVectors):
             WHERE ID = {1}
         """
 
-    # Then we need to potentially add a column for serailizedVectors
-
     # Serialize every item in allTrialVectors and push update to db
     for i in range(len(allTrialVectors)):
-        cursor = dbConnection.cursor()
         # Pickle and encode bytes to base64 string
         pickled = codecs.encode(pickle.dumps(
             allTrialVectors[i]), "base64").decode()
@@ -119,10 +116,9 @@ def pushVectorsToTrialTable(dbConnection, allTrialVectors):
         # Format the SQL command with the id & vector and then execute it on a cursor, and finally commit the transaction
         query = sql.format(pickled, id)
         cursor.execute(query)
-        dbConnection.commit()
 
     # Commit the transactions
-    # dbConnection.commit()
+    dbConnection.commit()
 
 
 def dotProduct(text, trialVectors):
