@@ -7,6 +7,9 @@
  * Allow for realtime search by the consumer appliaction by generalizing these methods
 """
 
+from http import HTTPStatus
+import socketserver
+import http.server
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import numpy as np
@@ -250,7 +253,7 @@ hostName = "localhost"
 serverPort = 80
 
 
-class MyServer(BaseHTTPRequestHandler):
+class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
@@ -271,14 +274,5 @@ class MyServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes(result, "utf-8"))
 
 
-if __name__ == "__main__":
-    webServer = HTTPServer((hostName, serverPort), MyServer)
-    print("Server started http://%s:%s" % (hostName, serverPort))
-
-    try:
-        webServer.serve_forever()
-    except KeyboardInterrupt:
-        pass
-
-    webServer.server_close()
-    print("Server stopped.")
+httpd = socketserver.TCPServer(('', 80), Handler)
+httpd.serve_forever()
