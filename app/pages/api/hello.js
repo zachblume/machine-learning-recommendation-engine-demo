@@ -6,7 +6,6 @@ export const config = {
 };
 
 export default (req) => {
-  return NextResponse.json({
-    name: `Hello, from ${req.url} I'm now an Edge Function!`,
-  });
+  let results = await fetch("http://34.86.228.54/?query=" + req.query.query);
+  return NextResponse.json(results);
 };
