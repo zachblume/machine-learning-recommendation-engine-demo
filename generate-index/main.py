@@ -49,7 +49,7 @@ def loadTrialsTableFromTestData(dbConnection):
     # Add the serialized vector column for later
     cursor = dbConnection.cursor()
     sql = """
-            ALTER TABLE clinical_trials 
+            ALTER TABLE clinical_trials
             ADD COLUMN serialized_vectors text;
             """
     cursor.execute(sql)
@@ -132,11 +132,17 @@ def findClosestDotProduct(text, tokenizer, model, dbConnection):
     # Panda=>list for trialIDs and serialized_vectors
     trialIDs = trialTable.id.values.tolist()
     trialVectors = trialTable.serialized_vectors.values.tolist()
+    trialAbstracts = trialTable.abstract_text.values.tolist()
 
     # Deserialize (unpickle and base 64 decode) the vector embeddings in place
     for i in range(len(trialVectors)):
         trialVectors[i] = pickle.loads(codecs.decode(
             trialVectors[i].encode(), "base64"))
+
+    # print(trialVectors[0])
+    # return
+
+    trialVectors = torch.stack(trialVectors)
 
     # Compute dot score between query and all trial vectors
     scores = torch.mm(vectorOutputToCompare, trialVectors.transpose(0, 1))[
@@ -150,7 +156,9 @@ def findClosestDotProduct(text, tokenizer, model, dbConnection):
 
     # Output passages & scores
     for ID, score in IDscorePairs:
-        return ID
+        # return ID
+        # return scores[]
+        return str(ID)+str(score)+str(trialAbstracts[ID])
 
 
 def meanPooling(output, attentionMask):
@@ -223,7 +231,7 @@ def main():
     else:
         print("Table already precomputed")
 
-        query = "alzheimers"
+        query = "Cardiovascular disease ( CVD ) and the underlying atherosclerosis begin in childhood "
         result = findClosestDotProduct(query, tokenizer, model, dbConnection)
         print(result)
 
