@@ -122,7 +122,7 @@ def main():
     model = AutoModel.from_pretrained("Charangan/MedBERT")
 
     # Connect to DB
-    dbConnection = db.connect("15ktrain.db")
+    dbConnection = db.connect("15ktrain.sqlite")
 
     # Load the database (this only needs to be executed once...)
     loadTrialsTableFromTestData(dbConnection)
