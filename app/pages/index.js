@@ -1,11 +1,34 @@
+import { useState, useEffect } from "react";
+
+import Highlighter from "react-highlight-words";
+
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
-  let results = [];
-  results.push({ text: "sdfsfsdf" });
-  results.push({ text: "sdfsfsdf" });
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (query !== "") {
+      setLoading(true);
+      let url = "http://34.86.228.54/?query=" + query;
+      let response = fetch(url);
+      response.then(async (res) => {
+        res = await res.text();
+        // console.log({ res });
+        // res.split("####");
+        setResults(res.split("####"));
+        setLoading(false);
+      });
+    }
+  }, [query]);
+
+  function search() {
+    setQuery(document.getElementById("searchFor").value);
+  }
 
   return (
     <div className={styles.container}>
@@ -18,14 +41,23 @@ export default function Home() {
       <main>
         <h1>Search a database of 15k clinical trials using medBERT</h1>
         <input type="text" id="searchFor" className="" />
+        <input type="submit" value="Search" onClick={search} />
         <div className="clear">
-          {results.map((result) => (
-            <>
-              <div className="card">
-                <p>{result.text}</p>
-              </div>
-            </>
-          ))}
+          {isLoading
+            ? "Loading..."
+            : results.map((result) => (
+                <>
+                  <div className="card">
+                    <Highlighter
+                      highlightClassName="YourHighlightClass"
+                      searchWords={query.split(" ")}
+                      autoEscape={true}
+                      textToHighlight={result.substring(0, 250)}
+                    />
+                    {/* <p>{result.substring(0, 250)}</p> */}
+                  </div>
+                </>
+              ))}
         </div>
       </main>
     </div>
