@@ -14,9 +14,7 @@ export default function Home() {
   useEffect(() => {
     if (query !== "") {
       setLoading(true);
-      let url =
-        "/api/forward?url=" +
-        encodeURIComponent("http://34.86.228.54/?query=" + query);
+      let url = "/api/forward?query=" + query;
       let response = fetch(url);
       response.then(async (res) => {
         res = await res.text();
