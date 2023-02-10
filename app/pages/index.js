@@ -56,7 +56,7 @@ export default function Home() {
 
       <main>
         <h1 className="text-3xl font-bold">
-          Search 15k clinical trials using machine learning - NLP demo
+          Search 15k clinical trials using machine learning - medBERT/NLP demo
         </h1>
 
         <input
