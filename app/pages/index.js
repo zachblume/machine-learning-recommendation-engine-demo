@@ -15,7 +15,8 @@ export default function Home() {
     if (query !== "") {
       setLoading(true);
       let url =
-        "/api/forward?url=" + encodeURI("http://34.86.228.54/?query=" + query);
+        "/api/forward?url=" +
+        encodeURIComponent("http://34.86.228.54/?query=" + query);
       let response = fetch(url);
       response.then(async (res) => {
         res = await res.text();
