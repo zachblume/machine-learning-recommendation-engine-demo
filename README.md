@@ -7,3 +7,7 @@ Using BERT (a attention-transformer NLP model) to generate a vector-based index 
 Take a look at:
 * [generate-index/main.py](generate-index/main.py)
 * [app/pages/index.js](app/pages/index.js)
+
+Screenshot:
+
+![alt text](screenshot.png)
