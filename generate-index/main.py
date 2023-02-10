@@ -1,6 +1,9 @@
 # A simple Python script to
-# (1) generate the BERT model and
-# (2) apply it to the database
+# * Load the medBERT model
+# * Produce and store vectors for 15k public clinical trial article abstracts
+# * Produce and store vectors for a series of example clinical questions
+# * Precalculate the best matching trial for each question
+# * Allow for realtime search by the consumer appliaction by generalizing these methods
 
 import numpy as np
 import pandas as pd
