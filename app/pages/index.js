@@ -89,10 +89,10 @@ export default function Home() {
 
           <div className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow  p-3 px-4">
             The backend is a Python web server running on a Google Compute
-            instance, using machine learning (medBERT, an implement of
+            instance, using machine learning (medBERT, an implementation of
             Google&apos;s BERT transformer) to pre-compute vector embeddings for
-            the abstracts taken from a database of public clinical trials, and
-            compare the current query against that vector space, returning a
+            the text abstracts taken from a database of public clinical trials,
+            and compare the current query against that vector space, returning a
             dot-product distance &apos;score&apos;.
           </div>
           <div className="mb-1 col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow p-3 px-4">
