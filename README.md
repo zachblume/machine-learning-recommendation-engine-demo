@@ -8,6 +8,8 @@ Take a look at:
 * [generate-index/main.py](generate-index/main.py)
 * [app/pages/index.js](app/pages/index.js)
 
+App live at [https://tmn-demo.vercel.app/](https://tmn-demo.vercel.app/)
+
 Screenshot:
 
 ![alt text](screenshot.png)
