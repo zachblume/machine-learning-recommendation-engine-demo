@@ -51,7 +51,13 @@ export default function Home() {
           Search a database of 15k clinical trials using medBERT
         </h1>
 
-        <input type="text" id="searchFor" className="" onKeyDown={keypress} />
+        <input
+          type="text"
+          id="searchFor"
+          className=""
+          onKeyDown={keypress}
+          onChange={search}
+        />
         <input
           type="submit"
           value="Search"
