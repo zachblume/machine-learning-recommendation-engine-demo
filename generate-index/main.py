@@ -121,7 +121,7 @@ def pushVectorsToTrialTable(dbConnection, allTrialVectors):
     dbConnection.commit()
 
 
-def dotProduct(text, trialVectors):
+def dotProduct(text):
     # Transform text to vectors
     vectorOutput = transform(text)
 
@@ -192,10 +192,19 @@ def main():
     # Connect to DB
     dbConnection = db.connect("15ktrain.sqlite")
 
-    # Load the database (this only needs to be executed once...)
-    loadTrialsTableFromTestData(dbConnection)
-    allTrialVectors = generateTrialVectors(dbConnection, tokenizer, model)
-    pushVectorsToTrialTable(dbConnection, allTrialVectors)
+    # If the trials table doesn't exist...
+    cursor = dbConnection.cursor()
+    tableExists = cursor.execute(
+        """
+        SELECT name FROM sqlite_master WHERE type='table' AND name='clinical_trials'
+        """).fetchall()
+    if not tableExists:
+        # Precompute the trial vector embeddings and store in the database (this only needs to be executed once...)
+        loadTrialsTableFromTestData(dbConnection)
+        allTrialVectors = generateTrialVectors(dbConnection, tokenizer, model)
+        pushVectorsToTrialTable(dbConnection, allTrialVectors)
+    else:
+        print("Table already precomputed")
 
     print("END")
 
