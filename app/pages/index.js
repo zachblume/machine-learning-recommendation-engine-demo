@@ -112,7 +112,7 @@ export default function Home() {
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
         >
           {isLoading
-            ? "Loading..."
+            ? "Type something in the search box at the top to begin..."
             : results.map((result, index) => {
                 let resultSplit = result.split("||||");
                 let truncatedText =
