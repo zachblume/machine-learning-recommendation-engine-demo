@@ -129,7 +129,7 @@ def pushVectorsToTrialTable(dbConnection, allTrialVectors):
     dbConnection.commit()
 
 
-def findClosestDotProduct(text, tokenizer, model, dbConnection):
+def findClosestDotProduct(text, tokenizer, model, dbConnection, trialIDs, trialVectors, trialAbstracts):
     """
     Calculcate the dot product of a query text against the 
     stored vector embeddings of clinical trials
@@ -137,20 +137,6 @@ def findClosestDotProduct(text, tokenizer, model, dbConnection):
     """
     # Transform text to vector embedding
     vectorOutputToCompare = transform(text, tokenizer, model)
-
-    # Load trialVectors from database
-    trialTable = pd.read_sql_query(
-        "SELECT * from clinical_trials WHERE abstract_text!='' LIMIT 1000", dbConnection)
-
-    # Panda=>list for trialIDs and serialized_vectors
-    trialIDs = trialTable.id.values.tolist()
-    trialVectors = trialTable.serialized_vectors.values.tolist()
-    trialAbstracts = trialTable.abstract_text.values.tolist()
-
-    # Deserialize (unpickle and base 64 decode) the vector embeddings in place
-    for i in range(len(trialVectors)):
-        trialVectors[i] = pickle.loads(codecs.decode(
-            trialVectors[i].encode(), "base64"))
 
     # Turn the list of tensors into a stacked tensor (required for torch.mm)
     trialVectors = torch.stack(trialVectors)
@@ -171,7 +157,7 @@ def findClosestDotProduct(text, tokenizer, model, dbConnection):
     for ID, score in IDscorePairs:
         # return ID
         # return scores[]
-        results.append(trialAbstracts[ID])
+        results.append(str(score)+"||||"+trialAbstracts[ID])
         i += 1
         if i > 20:
             break
@@ -272,6 +258,20 @@ tokenizer = AutoTokenizer.from_pretrained("Charangan/MedBERT")
 model = AutoModel.from_pretrained("Charangan/MedBERT")
 dbConnection = db.connect("./15ktrain.sqlite")
 
+# Load trialVectors from database
+trialTable = pd.read_sql_query(
+    "SELECT * from clinical_trials WHERE abstract_text!='' LIMIT 1000", dbConnection)
+
+# Panda=>list for trialIDs and serialized_vectors
+trialIDs = trialTable.id.values.tolist()
+trialVectors = trialTable.serialized_vectors.values.tolist()
+trialAbstracts = trialTable.abstract_text.values.tolist()
+
+# Deserialize (unpickle and base 64 decode) the vector embeddings in place
+for i in range(len(trialVectors)):
+    trialVectors[i] = pickle.loads(codecs.decode(
+        trialVectors[i].encode(), "base64"))
+
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     """"
@@ -288,7 +288,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         query = params["query"]
         # result = query
 
-        result = findClosestDotProduct(query, tokenizer, model, dbConnection)
+        result = findClosestDotProduct(
+            query, tokenizer, model, dbConnection, trialIDs, trialVectors, trialAbstracts)
         result = '####'.join(result)
 
         self.wfile.write(bytes(result, "utf-8"))
