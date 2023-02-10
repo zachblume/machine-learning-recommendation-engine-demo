@@ -40,20 +40,18 @@ def loadTrialsTableFromTestData(dbConnection):
     )
 
 
-def generateTrialVectors(dbConnection):
+def generateTrialVectors(dbConnection, tokenizer, model):
     """Generate"""
-    # Get MedBERT model from HuggingFace
-    tokenizer = AutoTokenizer.from_pretrained("Charangan/MedBERT")
-    model = AutoModel.from_pretrained("Charangan/MedBERT")
 
     # Load DB to pandas dataframe
-    trials = pd.read_sql_table(table_name='clinical_trials', con=dbConnection)
+    # trials = pd.read_sql_table(table_name='clinical_trials', con=dbConnection) # Actually this is SQLalchemy
+    trials = pd.read_sql_query("SELECT * from clinical_trials", dbConnection)
 
     # Get the text column and
     trialsList = trials.abstract_text.values.tolist()
 
     # Encode query and docs
-    trialVectors = transform(trialsList)
+    trialVectors = transform(trialsList, tokenizer, model)
 
     #
 
@@ -118,13 +116,18 @@ def main():
     """Load, calculate and insert back"""
     print("BEGIN")
 
+    # Get MedBERT model and tokenizer (from HuggingFace database)
+    # It also thankfully caches the .bin model file so no crazy traffic with nodemon hot reloading
+    tokenizer = AutoTokenizer.from_pretrained("Charangan/MedBERT")
+    model = AutoModel.from_pretrained("Charangan/MedBERT")
+
     # Connect to DB
     dbConnection = db.connect("15ktrain.db")
 
     # Load the database (this only needs to be executed once...)
-    # loadTrialsTableFromTestData(dbConnection)
-    # results = generateTrialVectors(dbConnection)
-    # pushVectorsToTrialTable(dbConnection, results)
+    loadTrialsTableFromTestData(dbConnection)
+    results = generateTrialVectors(dbConnection, tokenizer, model)
+    pushVectorsToTrialTable(dbConnection, results)
 
     print("END")
 
