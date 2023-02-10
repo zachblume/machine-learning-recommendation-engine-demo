@@ -1,3 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-size: 1.1rem;
+}
+
 html,
 body {
   padding: 0;
@@ -42,5 +50,17 @@ input {
 }
 
 body {
-  padding: 2vh 5vw;
+  padding: 7vh 5vw;
+  @apply bg-slate-100;
+}
+
+#searchFor {
+  @apply rounded-md shadow focus:border-indigo-500 focus:ring-indigo-500;
+  width: 500px;
+}
+#submit {
+  @apply m-3 inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer;
+}
+
+h1 {
 }
