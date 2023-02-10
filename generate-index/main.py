@@ -166,8 +166,9 @@ def findClosestDotProduct(text, tokenizer, model, dbConnection):
         # return ID
         # return scores[]
         results.append(trialAbstracts[ID])
-        i++
-        if (i > 20) break
+        i += 1
+        if i > 20:
+            break
     return results
 
 
