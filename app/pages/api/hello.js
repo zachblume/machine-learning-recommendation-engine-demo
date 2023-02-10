@@ -5,7 +5,7 @@ export const config = {
   regions: ["iad1"], // only execute this function on iad1
 };
 
-export default (req) => {
+export default async (req) => {
   let results = await fetch("http://34.86.228.54/?query=" + req.query.query);
   return NextResponse.json(results);
 };
