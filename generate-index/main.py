@@ -12,7 +12,7 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModel
 
 
-def loadDB(dbConnection):
+def loadTrialsTableFromTestData(dbConnection):
     """ Load the training database file into a proper database format
         PubMed 200k RCT dataset
         https://github.com/Franck-Dernoncourt/pubmed-rct
@@ -37,6 +37,80 @@ def loadDB(dbConnection):
     )
 
 
+def generateTrialVectors(dbConnection):
+    """Generate"""
+    # Get MedBERT model from HuggingFace
+    tokenizer = AutoTokenizer.from_pretrained("Charangan/MedBERT")
+    model = AutoModel.from_pretrained("Charangan/MedBERT")
+
+    # Load DB to pandas dataframe
+    trials = pd.read_sql_table(table_name='clinical_trials', con=dbConnection)
+
+    # Get the text column and
+    trialsList = trials.abstract_text.values.tolist()
+
+    # Encode query and docs
+    trialVectors = transform(trialsList)
+
+    #
+
+
+def pushVectorsToTrialTable(dbConnection):
+    """Push the trial vectors back to DB"""
+
+
+def dotProduct():
+    # Trasnform text to vectors
+    vectorOutput = transform(query)
+
+    # Compute dot score between query and all trial vectors
+    scores = torch.mm(vectorOutput, trialVectors.transpose(0, 1))[
+        0].cpu().tolist()
+
+    # Combine docs & scores
+    doc_score_pairs = list(zip(docs, scores))
+
+    # Sort by decreasing score
+    doc_score_pairs = sorted(doc_score_pairs, key=lambda x: x[1], reverse=True)
+
+    # Output passages & scores
+    for doc, score in doc_score_pairs:
+        print(score, doc)
+
+
+def meanPooling(output, attentionMask):
+    """Mean Pooling - Take average of all tokens
+        This math was taken from a framework."""
+    tokenVectors = output.last_hidden_state
+    expandedMask = attentionMask.unsqueeze(
+        -1).expand(tokenVectors.size()).float()
+    return
+    (torch.sum(tokenVectors * expandedMask, 1)
+     /
+     torch.clamp(expandedMask.sum(1), min=1e-9))
+
+
+def transform(text, tokenizer, model):
+    """Compute vectors from text"""
+
+    # Tokenize
+    tokenized = tokenizer(text, padding=True,
+                          truncation=True, return_tensors='pt')
+
+    # Transform, no_grad for memory saving
+    with torch.no_grad():
+        output = model(**tokenized, return_dict=True)
+
+    # Pool
+    vectors = meanPooling(output, tokenized['attention_mask'])
+
+    # Normalize
+    vectors = F.normalize(vectors, p=2, dim=1)
+
+    # Return vectors (serialization later)
+    return vectors
+
+
 def main():
     """Load, calculate and insert back"""
     print("BEGIN")
@@ -45,9 +119,9 @@ def main():
     dbConnection = db.connect("15ktrain.db")
 
     # Load the database (this only needs to be executed once...)
-    # loadDB(dbConnection)
-    # results = generate(dbConnection)
-    # updateDB(dbConnection, results)
+    # loadTrialsTableFromTestData(dbConnection)
+    # results = generateTrialVectors(dbConnection)
+    # pushVectorsToTrialTable(dbConnection, results)
 
     print("END")
 
