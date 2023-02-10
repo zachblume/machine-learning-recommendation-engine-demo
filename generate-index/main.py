@@ -231,7 +231,7 @@ def main():
     else:
         print("Table already precomputed")
 
-        query = "Cardiovascular disease ( CVD ) and the underlying atherosclerosis begin in childhood "
+        query = input("Text to match to?: ")
         result = findClosestDotProduct(query, tokenizer, model, dbConnection)
         print(result)
 
