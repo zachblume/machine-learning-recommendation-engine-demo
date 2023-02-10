@@ -46,33 +46,49 @@ def loadTrialsTableFromTestData(dbConnection):
 
 
 def generateTrialVectors(dbConnection, tokenizer, model):
-    """Generate"""
+    """Generate embeddings for each of the trial db rows"""
 
     # Load DB to pandas dataframe
     # trials = pd.read_sql_table(table_name='clinical_trials', con=dbConnection) # Actually this is SQLalchemy
-    trials = pd.read_sql_query("SELECT * from clinical_trials", dbConnection)
+    trials = pd.read_sql_query(
+        "SELECT * from clinical_trials WHERE abstract_text!='' LIMIT 1000", dbConnection)
 
     # Get the text column and transform it from a panda into a simple py list
     trialsList = trials.abstract_text.values.tolist()
 
     # Transform the text to vector embeddings using model
     # Let's make this maneagable lists of 100 at a time
-    for i in range(math.floor(len(trialsList) / 100)):
-        print("FOR loop")
+    i = 0
+    allTrialVectors = []
+    for i in range(math.ceil(len(trialsList)/100)):
+        # Mark the loop
+        print("LOOP "+str(i))
+
+        # Chunk into 100s
         start = i*100
-        end = start + 100
+        end = start+100
+        if (end > len(trialsList)):
+            end = len(trialsList)-1
         chunk = trialsList[start:end]
+
+        # Transform list of trials to list of trialVectors
         trialVectorsChunk = transform(chunk, tokenizer, model)
-        print("END loop")
+
+        # Add to output
+        allTrialVectors.append(trialVectorsChunk)
+
+    return allTrialVectors
 
 
-def pushVectorsToTrialTable(dbConnection):
+def pushVectorsToTrialTable(dbConnection, allTrialVectors):
     """Push the trial vectors back to DB"""
 
+    
 
-def dotProduct():
-    # Trasnform text to vectors
-    vectorOutput = transform(query)
+
+def dotProduct(text, trialVectors):
+    # Transform text to vectors
+    vectorOutput = transform(text)
 
     # Compute dot score between query and all trial vectors
     scores = torch.mm(vectorOutput, trialVectors.transpose(0, 1))[
@@ -106,11 +122,14 @@ def meanPooling(output, attentionMask):
 def transform(text, tokenizer, model):
     """Compute vectors from text"""
 
-    # text = ["asfsd sd fs df", "bsdf sdf sdf sdf"]
+    # BERT can only handle 512 tokens
 
     # Tokenize
     tokenized = tokenizer(text, padding=True,
-                          truncation=True, return_tensors='pt')
+                          # BERT CAN ONLY ACCEPT <512 tokens including special [CLS] and [SEP]
+                          max_length=510,
+                          truncation='longest_first',
+                          return_tensors='pt')
 
     # Transform, no_grad for memory saving
     with torch.no_grad():
@@ -140,8 +159,8 @@ def main():
 
     # Load the database (this only needs to be executed once...)
     loadTrialsTableFromTestData(dbConnection)
-    results = generateTrialVectors(dbConnection, tokenizer, model)
-    pushVectorsToTrialTable(dbConnection, results)
+    allTrialVectors = generateTrialVectors(dbConnection, tokenizer, model)
+    pushVectorsToTrialTable(dbConnection, allTrialVectors)
 
     print("END")
 
