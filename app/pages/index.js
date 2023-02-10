@@ -3,6 +3,10 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
+  let results = [];
+  results.push({ text: "sdfsfsdf" });
+  results.push({ text: "sdfsfsdf" });
+
   return (
     <div className={styles.container}>
       <Head>
@@ -12,24 +16,17 @@ export default function Home() {
       </Head>
 
       <main>
-        <h1>
-          A series of questions and their most closely matching clinical trials
-          using medBERT
-        </h1>
-        {examples.map((example) => (
-          <>
-            <div className="card">
-              <h2>{example.title}</h2>
-              <p>{example.text}</p>
-              <div className="best-trial-match-fulltext">
-                {example.bestTrialMatch}
-              </div>
-            </div>
-          </>
-        ))}
-        <h1>Search the clinical trials using medBERT</h1>
+        <h1>Search a database of 15k clinical trials using medBERT</h1>
         <input type="text" id="searchFor" className="" />
-        <ul className="search-results"></ul>
+        <div className="clear">
+          {results.map((result) => (
+            <>
+              <div className="card">
+                <p>{result.text}</p>
+              </div>
+            </>
+          ))}
+        </div>
       </main>
     </div>
   );
