@@ -16,6 +16,8 @@ import torch
 import math
 import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModel
+import codecs
+import pickle
 
 
 def loadTrialsTableFromTestData(dbConnection):
@@ -41,8 +43,17 @@ def loadTrialsTableFromTestData(dbConnection):
         if_exists="replace",           # Fail if table is already present
         index=True,                 # Write DF frame index as column
         index_label="id",           # Gives index column a columnname
-        chunksize=1000              # Write this many rows at a time
+        chunksize=1000              # Write this many rows at a time to db
     )
+
+    # Add the serialized vector column for later
+    cursor = dbConnection.cursor()
+    sql = """
+            ALTER TABLE clinical_trials 
+            ADD COLUMN serialized_vectors text;
+            """
+    cursor.execute(sql)
+    dbConnection.commit()
 
 
 def generateTrialVectors(dbConnection, tokenizer, model):
@@ -62,7 +73,7 @@ def generateTrialVectors(dbConnection, tokenizer, model):
     allTrialVectors = []
     for i in range(math.ceil(len(trialsList)/100)):
         # Mark the loop
-        print("LOOP "+str(i))
+        print("TRIAL VECTORIZE LOOP "+str(i))
 
         # Chunk into 100s
         start = i*100
@@ -75,7 +86,7 @@ def generateTrialVectors(dbConnection, tokenizer, model):
         trialVectorsChunk = transform(chunk, tokenizer, model)
 
         # Add to output
-        allTrialVectors.append(trialVectorsChunk)
+        allTrialVectors += trialVectorsChunk
 
     return allTrialVectors
 
@@ -83,20 +94,35 @@ def generateTrialVectors(dbConnection, tokenizer, model):
 def pushVectorsToTrialTable(dbConnection, allTrialVectors):
     """Push the trial vectors back to DB"""
 
-    # First we need to serialize allTrialVectors
-    print(allTrialVectors)
+    # Prep db cursor
+    # cursor = dbConnection.cursor()
+
+    # Prep SQL statement to push SQL UPDATEs
+    sql = """
+            UPDATE clinical_trials
+            SET serialized_vectors = '{0}'
+            WHERE ID = {1}
+        """
 
     # Then we need to potentially add a column for serailizedVectors
 
-    # Then we can push SQL UPDATEs
-    sql = """
-        UPDATE clinical_trials
-        SET vectors = {0}
-        WHERE ID = {1}
-    """
+    # Serialize every item in allTrialVectors and push update to db
+    for i in range(len(allTrialVectors)):
+        cursor = dbConnection.cursor()
+        # Pickle and encode bytes to base64 string
+        pickled = codecs.encode(pickle.dumps(
+            allTrialVectors[i]), "base64").decode()
 
-    # Format the SQL command with the id & vector and then execute it on a cursor, and finally commit the transaction
-    dbConnection.cursor().execute(sql.format(serializedVectors, id)).commit()
+        # ID of the row we're updating
+        id = i
+
+        # Format the SQL command with the id & vector and then execute it on a cursor, and finally commit the transaction
+        query = sql.format(pickled, id)
+        cursor.execute(query)
+        dbConnection.commit()
+
+    # Commit the transactions
+    # dbConnection.commit()
 
 
 def dotProduct(text, trialVectors):
