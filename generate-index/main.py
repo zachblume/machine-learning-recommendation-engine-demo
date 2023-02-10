@@ -7,6 +7,8 @@
  * Allow for realtime search by the consumer appliaction by generalizing these methods
 """
 
+import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
@@ -203,7 +205,7 @@ def transform(text, tokenizer, model):
     return vectors
 
 
-def main():
+def terminal_main():
     """Load, calculate and insert back"""
     print("BEGIN")
 
@@ -241,4 +243,42 @@ def main():
 
 
 # Run program
-main()
+# main()
+
+# Python 3 simple server
+hostName = "localhost"
+serverPort = 80
+
+
+class MyServer(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+
+        tokenizer = AutoTokenizer.from_pretrained("Charangan/MedBERT")
+        model = AutoModel.from_pretrained("Charangan/MedBERT")
+        dbConnection = db.connect("./15ktrain.sqlite")
+
+        i = self.path.index("?") + 1
+        params = dict([tuple(p.split("=")) for p in self.path[i:].split("&")])
+        query = params["query"]
+        # result = query
+
+        result = findClosestDotProduct(query, tokenizer, model, dbConnection)
+        result = '####'.join(result)
+
+        self.wfile.write(bytes(result, "utf-8"))
+
+
+if __name__ == "__main__":
+    webServer = HTTPServer((hostName, serverPort), MyServer)
+    print("Server started http://%s:%s" % (hostName, serverPort))
+
+    try:
+        webServer.serve_forever()
+    except KeyboardInterrupt:
+        pass
+
+    webServer.server_close()
+    print("Server stopped.")
