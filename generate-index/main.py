@@ -62,7 +62,7 @@ def generateTrialVectors(dbConnection, tokenizer, model):
     # Load DB to pandas dataframe
     # trials = pd.read_sql_table(table_name='clinical_trials', con=dbConnection) # Actually this is SQLalchemy
     trials = pd.read_sql_query(
-        "SELECT * from clinical_trials WHERE abstract_text!='' LIMIT 10", dbConnection)
+        "SELECT * from clinical_trials WHERE abstract_text!='' LIMIT 1000", dbConnection)
 
     # Get the text column and transform it from a panda into a simple py list
     trialsList = trials.abstract_text.values.tolist()
