@@ -1,6 +1,6 @@
 # tmn-demo
 
-Using BERT (a attention-transformer NLP model) to generate a vector-based index for the purpose of:
+Using BERT (a attention-transformer NLP model), specifically medBERT, to generate a vector-based index for the purpose of:
 * matching clinical trails to a string typed into a search box in real-time
 
 Take a look at:
