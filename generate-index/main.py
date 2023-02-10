@@ -1,4 +1,4 @@
-# A simple Python script to
+# A simple Python script to:
 # * Load the medBERT model
 # * Produce and store vectors for 15k public clinical trial article abstracts
 # * Produce and store vectors for a series of example clinical questions
@@ -11,6 +11,7 @@ from pandas import DataFrame, Series
 import sqlite3 as db
 import random
 import torch
+import math
 import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModel
 
@@ -47,13 +48,19 @@ def generateTrialVectors(dbConnection, tokenizer, model):
     # trials = pd.read_sql_table(table_name='clinical_trials', con=dbConnection) # Actually this is SQLalchemy
     trials = pd.read_sql_query("SELECT * from clinical_trials", dbConnection)
 
-    # Get the text column and
+    # Get the text column and transform it from a panda into a simple py list
     trialsList = trials.abstract_text.values.tolist()
 
-    # Encode query and docs
-    trialVectors = transform(trialsList, tokenizer, model)
-
-    #
+    # Transform the text to vector embeddings using model
+    # Let's make this maneagable lists of 100 at a time
+    for i in range(math.floor(len(trialsList) / 100)):
+        print("FOR loop")
+        print(i)
+        start = i*100
+        end = start + 100
+        chunk = trialsList[start:end]
+        trialVectorsChunk = transform(chunk, tokenizer, model)
+        print("END loop")
 
 
 def pushVectorsToTrialTable(dbConnection):
@@ -85,14 +92,13 @@ def meanPooling(output, attentionMask):
     tokenVectors = output.last_hidden_state
     expandedMask = attentionMask.unsqueeze(
         -1).expand(tokenVectors.size()).float()
-    return
-    (torch.sum(tokenVectors * expandedMask, 1)
-     /
-     torch.clamp(expandedMask.sum(1), min=1e-9))
+    return (torch.sum(tokenVectors * expandedMask, 1) / torch.clamp(expandedMask.sum(1), min=1e-9))
 
 
 def transform(text, tokenizer, model):
     """Compute vectors from text"""
+
+    # text = ["asfsd sd fs df", "bsdf sdf sdf sdf"]
 
     # Tokenize
     tokenized = tokenizer(text, padding=True,
