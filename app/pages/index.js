@@ -46,7 +46,7 @@ export default function Home() {
 
         <input type="text" id="searchFor" className="" />
         <input type="submit" value="Search" onClick={search} id="submit" />
-        <p className="mb-3">
+        <p className="mb-1">
           Take a look at the code on github at{" "}
           <a
             href="https://github.com/zachblume/tmn-demo"
@@ -54,6 +54,15 @@ export default function Home() {
           >
             https://github.com/zachblume/tmn-demo
           </a>
+          .
+        </p>
+        <p className="mb-1">
+          This frontend is a Next.JS app running on Vercel, the backend is a
+          Python web server running on a Google Compute instance.
+        </p>
+        <p className="mb-3">
+          Try it out by searching for matching trials... try 'cancer' or
+          'asthma' ... and click the search button.
         </p>
         <ul
           role="list"
