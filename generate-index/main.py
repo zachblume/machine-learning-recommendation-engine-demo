@@ -256,16 +256,17 @@ def terminal_main():
 hostName = "localhost"
 serverPort = 80
 
+# Do the basics outside the web server to prevent reloading every time
+tokenizer = AutoTokenizer.from_pretrained("Charangan/MedBERT")
+model = AutoModel.from_pretrained("Charangan/MedBERT")
+dbConnection = db.connect("./15ktrain.sqlite")
+
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
-
-        tokenizer = AutoTokenizer.from_pretrained("Charangan/MedBERT")
-        model = AutoModel.from_pretrained("Charangan/MedBERT")
-        dbConnection = db.connect("./15ktrain.sqlite")
 
         i = self.path.index("?") + 1
         params = dict([tuple(p.split("=")) for p in self.path[i:].split("&")])
