@@ -90,7 +90,7 @@ export default function Home() {
                         <p className="mt-1  text-sm text-gray-500">
                           {resultSplit.length > 1 ? (
                             <>
-                              <span class="inline-flex items-center rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                              <span class="inline-flex items-center rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 mb-3">
                                 (Match Score: {score}){" "}
                               </span>
                             </>
