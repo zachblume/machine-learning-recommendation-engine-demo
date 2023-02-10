@@ -61,8 +61,8 @@ export default function Home() {
           Python web server running on a Google Compute instance.
         </p>
         <p className="mb-3">
-          Try it out by searching for matching trials... try 'cancer' or
-          'asthma' ... and click the search button.
+          Try it out by searching for matching trials... try &apos;cancer&apos;
+          or &apos;asthma&apos; ... and click the search button.
         </p>
         <ul
           role="list"
