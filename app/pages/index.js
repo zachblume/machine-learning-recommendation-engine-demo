@@ -99,10 +99,10 @@ export default function Home() {
             This frontend is a Next.JS app running on Vercel. Take a look at the
             code on github at{" "}
             <a
-              href="https://github.com/zachblume/tmn-demo"
+              href="https://github.com/zachblume/machine-learning-recommendation-engine-demo"
               className="font-medium text-blue-600 dark:text-blue-500 "
             >
-              https://github.com/zachblume/tmn-demo
+              https://github.com/zachblume/machine-learning-recommendation-engine-demo
             </a>
           </div>
         </div>
