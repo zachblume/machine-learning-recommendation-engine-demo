@@ -2,9 +2,8 @@
  A simple Python script to:
  * Load the medBERT model
  * Produce and store vectors for 15k public clinical trial article abstracts
- * Produce and store vectors for a series of example clinical questions
- * Precalculate the best matching trial for each question
- * Allow for realtime search by the consumer appliaction by generalizing these methods
+ * Standup a web service that accepts queries, converts to vector embeddings,
+   and returns the 20 most closely matching clinical trials
 """
 
 from http import HTTPStatus
@@ -62,7 +61,9 @@ def loadTrialsTableFromTestData(dbConnection):
 
 
 def generateTrialVectors(dbConnection, tokenizer, model):
-    """Generate embeddings for each of the trial db rows"""
+    """
+    Generate embeddings for each of the trial db rows
+    """
 
     # Load DB to pandas dataframe
     # trials = pd.read_sql_table(table_name='clinical_trials', con=dbConnection) # Actually this is SQLalchemy
@@ -97,7 +98,9 @@ def generateTrialVectors(dbConnection, tokenizer, model):
 
 
 def pushVectorsToTrialTable(dbConnection, allTrialVectors):
-    """Push the trial vectors back to DB"""
+    """
+    Push the trial vectors back to DB
+    """
 
     # Prep db cursor
     cursor = dbConnection.cursor()
@@ -127,6 +130,11 @@ def pushVectorsToTrialTable(dbConnection, allTrialVectors):
 
 
 def findClosestDotProduct(text, tokenizer, model, dbConnection):
+    """
+    Calculcate the dot product of a query text against the 
+    stored vector embeddings of clinical trials
+    to find the most similar
+    """
     # Transform text to vector embedding
     vectorOutputToCompare = transform(text, tokenizer, model)
 
@@ -144,9 +152,7 @@ def findClosestDotProduct(text, tokenizer, model, dbConnection):
         trialVectors[i] = pickle.loads(codecs.decode(
             trialVectors[i].encode(), "base64"))
 
-    # print(trialVectors[0])
-    # return
-
+    # Turn the list of tensors into a stacked tensor (required for torch.mm)
     trialVectors = torch.stack(trialVectors)
 
     # Compute dot score between query and all trial vectors
@@ -159,7 +165,7 @@ def findClosestDotProduct(text, tokenizer, model, dbConnection):
     # Sort by decreasing score
     IDscorePairs = sorted(IDscorePairs, key=lambda x: x[1], reverse=True)
 
-    # Output passages & scores
+    # Output 20 best matching passages as a py list
     results = []
     i = 0
     for ID, score in IDscorePairs:
@@ -187,11 +193,12 @@ def meanPooling(output, attentionMask):
 
 
 def transform(text, tokenizer, model):
-    """Compute vectors from text"""
-
-    # BERT can only handle 512 tokens
+    """
+    Compute vector embeddings from text
+    """
 
     # Tokenize
+    # NOTE: BERT can only handle 512 tokens
     tokenized = tokenizer(text, padding=True,
                           # BERT CAN ONLY ACCEPT <512 tokens including special [CLS] and [SEP]
                           max_length=510,
@@ -213,7 +220,9 @@ def transform(text, tokenizer, model):
 
 
 def terminal_main():
-    """Load, calculate and insert back"""
+    """
+    Load, calculate and insert back
+    """
     print("BEGIN")
 
     # Get MedBERT model and tokenizer (from HuggingFace database)
@@ -250,9 +259,11 @@ def terminal_main():
 
 
 # Run program
-# main()
+# terminal_main()
 
-# Python 3 simple server
+"""
+Below is the web server implementation
+"""
 hostName = "localhost"
 serverPort = 80
 
@@ -263,6 +274,10 @@ dbConnection = db.connect("./15ktrain.sqlite")
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+    """"
+    Handle get requests with ?query=TEXT by returning the 20 most similar trials to $query
+    """
+
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
