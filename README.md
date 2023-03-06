@@ -10,4 +10,4 @@ App live at [https://machine-learning-demo.vercel.app/](https://machine-learning
 
 Screenshot:
 
-![alt text](screenshot.png)
+![alt text](newscreenshot.png)
