@@ -49,24 +49,24 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <!-- Primary Meta Tags -->
+
 <title>Search 15k clinical trials using machine learning - medBERT/NLP demo</title>
-<meta name="title" content="Search 15k clinical trials using machine learning - medBERT/NLP demo">
-<meta name="description" content="Try it out by searching above for matching trials... try 'cancer' or 'asthma' or 'oxygen saturation' ... and click the search button. Note that some accurate matches do not contain the keywords you searched for, because language inference is taking the place of keyword search.">
+<meta name="title" content="Search 15k clinical trials using machine learning - medBERT/NLP demo"/>
+<meta name="description" content="Try it out by searching above for matching trials... try 'cancer' or 'asthma' or 'oxygen saturation' ... and click the search button. Note that some accurate matches do not contain the keywords you searched for, because language inference is taking the place of keyword search."/>
 
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://machine-learning-demo.vercel.app/">
-<meta property="og:title" content="Search 15k clinical trials using machine learning - medBERT/NLP demo">
-<meta property="og:description" content="Try it out by searching above for matching trials... try 'cancer' or 'asthma' or 'oxygen saturation' ... and click the search button. Note that some accurate matches do not contain the keywords you searched for, because language inference is taking the place of keyword search.">
-<meta property="og:image" content="https://raw.githubusercontent.com/zachblume/machine-learning-recommendation-engine-demo/main/newscreenshot.png">
 
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://machine-learning-demo.vercel.app/">
-<meta property="twitter:title" content="Search 15k clinical trials using machine learning - medBERT/NLP demo">
-<meta property="twitter:description" content="Try it out by searching above for matching trials... try 'cancer' or 'asthma' or 'oxygen saturation' ... and click the search button. Note that some accurate matches do not contain the keywords you searched for, because language inference is taking the place of keyword search.">
-<meta property="twitter:image" content="https://raw.githubusercontent.com/zachblume/machine-learning-recommendation-engine-demo/main/newscreenshot.png">
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://machine-learning-demo.vercel.app/"/>
+<meta property="og:title" content="Search 15k clinical trials using machine learning - medBERT/NLP demo"/>
+<meta property="og:description" content="Try it out by searching above for matching trials... try 'cancer' or 'asthma' or 'oxygen saturation' ... and click the search button. Note that some accurate matches do not contain the keywords you searched for, because language inference is taking the place of keyword search."/>
+<meta property="og:image" content="https://raw.githubusercontent.com/zachblume/machine-learning-recommendation-engine-demo/main/newscreenshot.png"/>
+
+
+    <meta property="twitter:card" content="summary_large_image"/>
+<meta property="twitter:url" content="https://machine-learning-demo.vercel.app/"/>
+<meta property="twitter:title" content="Search 15k clinical trials using machine learning - medBERT/NLP demo"/>
+<meta property="twitter:description" content="Try it out by searching above for matching trials... try 'cancer' or 'asthma' or 'oxygen saturation' ... and click the search button. Note that some accurate matches do not contain the keywords you searched for, because language inference is taking the place of keyword search."/>
+<meta property="twitter:image" content="https://raw.githubusercontent.com/zachblume/machine-learning-recommendation-engine-demo/main/newscreenshot.png"/>
       </Head>
 
       <main>
