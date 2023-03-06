@@ -5,7 +5,7 @@ const nextConfig = {
     return [
       {
         source: "/api/forwardme",
-        destination: "http://34.145.243.68/",
+        destination: "http://35.236.232.41/",
         // permanent: true,
       },
     ];
