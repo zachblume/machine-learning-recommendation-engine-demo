@@ -6,7 +6,7 @@ Take a look at:
 * [generate-index/main.py](generate-index/main.py) The db index generator and server backend (Python)
 * [app/pages/index.js](app/pages/index.js) The frontend (React + NextJS)
 
-App live at [https://tmn-demo.vercel.app/](https://tmn-demo.vercel.app/)
+App live at [https://machine-learning-demo.vercel.app/](https://machine-learning-demo.vercel.app)
 
 Screenshot:
 
