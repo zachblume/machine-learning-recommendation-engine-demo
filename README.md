@@ -1,6 +1,6 @@
 # BERT-based machine learning recommendation engine
 
-App live at [https://machine-learning-demo.vercel.app/](https://machine-learning-demo.vercel.app)
+<!--App live at [https://machine-learning-demo.vercel.app/](https://machine-learning-demo.vercel.app)-->
 
 Using BERT (a attention-transformer NLP model), specifically medBERT, to generate a embedding-based index in order to match the most similar clinical trails to a string typed into a search box, in real-time (<100ms).
 
